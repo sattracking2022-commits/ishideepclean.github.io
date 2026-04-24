@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CircuitNest | IoT & Arduino Projects India</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --card-hover: #16213a;
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'Space Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    overflow-x: hidden;
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent3); border-radius: 3px; }
+
+  /* ===== NOISE OVERLAY ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ===== HEADER / NAV ===== */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: rgba(10,14,23,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text span { color: var(--accent); }
+
+  nav { display: flex; align-items: center; gap: 0.25rem; }
+
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  nav a:hover { color: var(--accent); background: rgba(0,229,255,0.08); }
+
+  .nav-cta {
+    background: linear-gradient(135deg, var(--accent3), #9333ea) !important;
+    color: #fff !important;
+    padding: 0.5rem 1.1rem !important;
+    border-radius: 8px !important;
+    margin-left: 0.5rem;
+  }
+
+  .nav-cta:hover { opacity: 0.85; background: linear-gradient(135deg, var(--accent3), #9333ea) !important; }
+
+  /* ===== HERO ===== */
+  #home {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 70%);
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,229,255,0.1);
+    border: 1px solid rgba(0,229,255,0.25);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .dot-pulse {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -2px;
+    margin-bottom: 1.25rem;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  h1 .line2 { color: var(--accent); display: block; }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 540px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent3), #9333ea);
+    color: #fff;
+    border: none;
+    padding: 0.85rem 2rem;
+    border-radius: 10px;
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.4); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.85rem 2rem;
+    border-radius: 10px;
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+  }
+
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    margin-top: 4rem;
+    flex-wrap: wrap;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .stat { text-align: center; }
+  .stat-num {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    display: block;
+  }
+
+  .stat-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ===== SECTION COMMONS ===== */
+  section { padding: 5rem 2rem; }
+
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+
+  .section-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+
+  h2 {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-desc { color: var(--muted); max-width: 520px; line-height: 1.7; margin-bottom: 3rem; font-size: 0.95rem; }
+
+  /* ===== TECH STRIP ===== */
+  .tech-strip {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    overflow: hidden;
+  }
+
+  .tech-track {
+    display: flex;
+    gap: 3rem;
+    animation: marquee 22s linear infinite;
+    width: max-content;
+  }
+
+  .tech-item {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tech-item::before { content: '◆'; color: var(--accent3); font-size: 0.5rem; }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ===== PROJECTS GRID ===== */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent3), var(--accent));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .project-card:hover {
+    background: var(--card-hover);
+    border-color: rgba(0,229,255,0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  }
+
+  .project-card:hover::before { opacity: 1; }
+
+  .project-icon {
+    width: 46px;
+    height: 46px;
+    background: var(--surface2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+  }
+
+  .project-name {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    color: var(--text);
+  }
+
+  .project-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    flex: 1;
+  }
+
+  .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .tech-tag {
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(124,58,237,0.25);
+    color: #a78bfa;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 0.22rem 0.55rem;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .project-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+  }
+
+  .price-block { display: flex; flex-direction: column; }
+
+  .price-original {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: line-through;
+  }
+
+  .price-offer {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  .price-save {
+    font-size: 0.65rem;
+    color: var(--yellow);
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.2);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    margin-top: 0.2rem;
+    display: inline-block;
+  }
+
+  .btn-order {
+    background: var(--accent3);
+    color: #fff;
+    border: none;
+    padding: 0.55rem 1.1rem;
+    border-radius: 8px;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-order:hover { background: #9333ea; transform: scale(1.04); }
+
+  /* ===== SERVICES ===== */
+  #services { background: var(--surface); }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .service-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem 1.5rem;
+    transition: all 0.3s;
+    position: relative;
+  }
+
+  .service-card:hover {
+    border-color: rgba(0,229,255,0.3);
+    box-shadow: 0 0 30px rgba(0,229,255,0.06);
+    transform: translateY(-3px);
+  }
+
+  .service-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--accent3);
+    letter-spacing: 1px;
+    margin-bottom: 0.6rem;
+  }
+
+  .service-icon { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
+
+  .service-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .service-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+  /* ===== PRICING ===== */
+  .pricing-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .pricing-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .pricing-table th {
+    background: var(--surface2);
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+
+  .pricing-table td {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: middle;
+  }
+
+  .pricing-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .market-price { color: var(--muted); text-decoration: line-through; font-family: var(--font-mono); }
+  .offer-price { color: var(--green); font-weight: 700; font-family: var(--font-mono); font-size: 1rem; }
+
+  .discount-badge {
+    background: rgba(245,158,11,0.15);
+    color: var(--yellow);
+    border: 1px solid rgba(245,158,11,0.3);
+    font-size: 0.68rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+
+  /* ===== PAYMENT ===== */
+  #payment { background: var(--surface); }
+
+  .payment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .payment-methods { display: flex; flex-direction: column; gap: 1rem; }
+
+  .pay-method {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .pay-method:hover { border-color: rgba(0,229,255,0.3); }
+
+  .pay-icon { font-size: 1.6rem; }
+
+  .pay-name { font-weight: 700; font-size: 0.9rem; }
+  .pay-detail { font-size: 0.78rem; color: var(--muted); font-family: var(--font-mono); margin-top: 2px; }
+
+  .upi-box {
+    background: var(--bg);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 14px;
+    padding: 1.75rem;
+    text-align: center;
+  }
+
+  .upi-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    margin-bottom: 0.75rem;
+  }
+
+  .upi-id {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--accent);
+    font-weight: 700;
+    background: rgba(0,229,255,0.06);
+    border: 1px solid rgba(0,229,255,0.15);
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    display: inline-block;
+    margin-bottom: 1.25rem;
+    letter-spacing: 1px;
+  }
+
+  .qr-placeholder {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1rem;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #333;
+    text-align: center;
+    padding: 0.5rem;
+    font-family: var(--font-mono);
+  }
+
+  /* ===== CONTACT ===== */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .contact-info { display: flex; flex-direction: column; gap: 1rem; }
+
+  .contact-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.25s;
+  }
+
+  .contact-card:hover { border-color: rgba(0,229,255,0.3); transform: translateX(4px); }
+
+  .contact-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .contact-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 1px; font-family: var(--font-mono); }
+  .contact-value { font-weight: 600; font-size: 0.9rem; }
+  .contact-value a { color: var(--text); text-decoration: none; }
+  .contact-value a:hover { color: var(--accent); }
+
+  .contact-form-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+  }
+
+  .form-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.8px; }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    transition: border-color 0.2s;
+    outline: none;
+    appearance: none;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus { border-color: var(--accent3); }
+
+  .form-group textarea { resize: vertical; min-height: 100px; }
+
+  .btn-submit {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent3), #9333ea);
+    color: #fff;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 10px;
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.4); }
+
+  .whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #25d366;
+    color: #fff;
+    text-decoration: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .whatsapp-btn:hover { background: #128c4a; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,211,102,0.3); }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem 2rem;
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .footer-brand p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; margin-top: 0.75rem; max-width: 280px; }
+
+  .footer-col h4 {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+  }
+
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .footer-col ul li a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+    opacity: 0.7;
+  }
+
+  .footer-col ul li a:hover { color: var(--accent); opacity: 1; }
+
+  .social-links {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .social-link {
+    width: 36px;
+    height: 36px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .social-link:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .footer-bottom span { font-family: var(--font-mono); }
+
+  /* ===== BACK TO TOP ===== */
+  .back-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 42px;
+    height: 42px;
+    background: var(--accent3);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.1rem;
+    color: #fff;
+    transition: all 0.2s;
+    z-index: 500;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+  }
+
+  .back-top:hover { transform: translateY(-3px); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    nav { display: none; }
+    .payment-grid, .contact-grid { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .hero-stats { gap: 2rem; }
+  }
+
+  @media (max-width: 600px) {
+    section { padding: 3.5rem 1.25rem; }
+    header { padding: 0 1.25rem; }
+    .footer-top { grid-template-columns: 1fr; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+    h1 { letter-spacing: -1px; }
+    .pricing-table { overflow-x: auto; }
+  }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0 2rem;
+  }
+
+  /* ===== HIGHLIGHT CARD ===== */
+  .highlight {
+    background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(0,229,255,0.05));
+    border-color: rgba(124,58,237,0.3) !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- BACK TO TOP -->
+<a href="#home" class="back-top" title="Back to top">↑</a>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <a href="#home" class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">Circuit<span>Nest</span></div>
+  </a>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#projects">Projects</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#services">Services</a>
+    <a href="#contact">Contact</a>
+    <a href="https://wa.me/919876543210" target="_blank" class="nav-cta">📲 WhatsApp</a>
+  </nav>
+</header>
+
+<!-- ===== HERO ===== -->
+<section id="home">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-badge">
+    <div class="dot-pulse"></div>
+    🇮🇳 Made in India · Ships Across India
+  </div>
+
+  <h1>
+    Build Your Future
+    <span class="line2">with IoT & Arduino</span>
+  </h1>
+
+  <p class="hero-sub">
+    Ready-made electronics projects for school & college students, custom-built to your requirements. Arduino, ESP32, LoRa, RFID — we build it all.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#projects" class="btn-primary">🔭 Explore Projects</a>
+    <a href="#contact" class="btn-outline">💬 Custom Quote</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">200+</span>
+      <span class="stat-label">Projects Delivered</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">50+</span>
+      <span class="stat-label">Colleges Served</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">100%</span>
+      <span class="stat-label">Working Guarantee</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">24hr</span>
+      <span class="stat-label">Support</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TECH STRIP ===== -->
+<div class="tech-strip">
+  <div class="tech-track">
+    <span class="tech-item">Arduino UNO</span>
+    <span class="tech-item">ESP32</span>
+    <span class="tech-item">ESP8266</span>
+    <span class="tech-item">LoRa SX1278</span>
+    <span class="tech-item">Raspberry Pi</span>
+    <span class="tech-item">Neo-6M GPS</span>
+    <span class="tech-item">SIM800L GSM</span>
+    <span class="tech-item">RFID RC522</span>
+    <span class="tech-item">NodeMCU</span>
+    <span class="tech-item">L298N Motor Driver</span>
+    <span class="tech-item">DHT11 / DHT22</span>
+    <span class="tech-item">HC-SR04 Ultrasonic</span>
+    <span class="tech-item">OLED Display</span>
+    <span class="tech-item">Bluetooth HC-05</span>
+    <!-- duplicate for loop -->
+    <span class="tech-item">Arduino UNO</span>
+    <span class="tech-item">ESP32</span>
+    <span class="tech-item">ESP8266</span>
+    <span class="tech-item">LoRa SX1278</span>
+    <span class="tech-item">Raspberry Pi</span>
+    <span class="tech-item">Neo-6M GPS</span>
+    <span class="tech-item">SIM800L GSM</span>
+    <span class="tech-item">RFID RC522</span>
+    <span class="tech-item">NodeMCU</span>
+    <span class="tech-item">L298N Motor Driver</span>
+    <span class="tech-item">DHT11 / DHT22</span>
+    <span class="tech-item">HC-SR04 Ultrasonic</span>
+    <span class="tech-item">OLED Display</span>
+    <span class="tech-item">Bluetooth HC-05</span>
+  </div>
+</div>
+
+<!-- ===== PROJECTS ===== -->
+<section id="projects">
+  <div class="section-inner">
+    <span class="section-tag">// Our Products</span>
+    <h2>Ready-Made Projects</h2>
+    <p class="section-desc">All projects come assembled, tested, and with full documentation. Perfect for college submissions, science exhibitions, and learning.</p>
+
+    <div class="projects-grid">
+
+      <!-- 1 -->
+      <div class="project-card">
+        <div class="project-icon">📡</div>
+        <div class="project-name">GPS Vehicle Tracker</div>
+        <div class="project-desc">Real-time GPS tracking with SMS alerts via GSM module. Track location from any mobile — ideal for vehicle & asset tracking projects.</div>
+        <div class="tech-tags">
+          <span class="tech-tag">Neo-6M GPS</span>
+          <span class="tech-tag">SIM800L</span>
+          <span class="tech-tag">Arduino</span>
+        </div>
+        <div class="project-footer">
+          <div class="price-block">
+            <span class="price-original">₹3200</span>
+            <span class="price-offer">₹2500</span>
+            <span class="price-save">Save ₹700</span>
+          </div>
+          <a href="https://wa.me/919876543210?text=I want to order GPS Vehicle Tracker - ₹2500" target="_blank" class="btn-order">Order Now →</a>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="project-card">
+        <div class="project-icon">🏠</div>
+        <div class="project-name">Smart Home Automation</div>
+        <div class="project-desc">Control lights, fans, and appliances via phone app or voice. WiFi-based control using ESP32 with relay module and custom mobile app.</div>
+        <div class="tech-tags">
+          <span class="tech-tag">ESP32</span>
+          <span class="tech-tag">Relay 4Ch</span>
+          <span class="tech-tag">IoT App</span>
+        </div>
+        <div class="project-footer">
+          <div class="price-block">
+            <span class="price-original">₹2500</span>
+            <span class="price-offer">₹1800</span>
+            <span class="price-save">Save ₹700</span>
+          </div>
+          <a href="https://wa.me/919876543210?text=I want to order Smart Home Automation - ₹1800" target="_blank" class="btn-order">Order Now →</a>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="project-card highlight">
+        <div class="project-icon">📶</div>
+        <div class="project-name">LoRa Communication System</div>
+        <div class="project-desc">Long-range wireless communication up to 10km without internet. Transmitter-receiver pair with OLED display. Perfect for remote sensing projects.</div>
+        <div class="tech-tags">
+          <span class="tech-tag">LoRa SX1278</span>
+          <span class="tech-tag">Arduino</span>
+          <span class="tech-tag">OLED</span>
+        </div>
+        <div class="project-footer">
+          <div class="price-block">
+            <span class="price-original">₹4500</span>
+            <span class="price-offer">₹3500</span>
+            <span class="price-save">Save ₹1000</span>
+          </div>
+          <a href="https://wa.me/919876543210?text=I want to order LoRa Communication System - ₹3500" target="_blank" class="btn-order">Order Now →</a>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="project-card">
+        <div class="project-icon">🪪</div>
+        <div class="project-name">RFID Attendance System</div>
+        <div class="project-desc">Tap your card to mark attendance. Data stored on SD card and displayed on LCD. Includes 5 RFID cards. Works standalone — no PC required.</div>
+        <div class="tech-tags">
+          <span class="tech-tag">RFID RC522</span>
+          <span class="tech-tag">Arduino</span>
+          <span class="tech-tag">LCD I2C</span>
+        </div>
+        <div class="project-footer">
+          <div class="price-block">
+            <span class="price-original">₹2800</span>
+            <span class="price-offer">₹2200</span>
+            <span class="price-save">Save ₹600</span>
+          </div>
+          <a href="https://wa.me/919876543210?text=I want to order RFID Attendance System - ₹2200" target="_blank" class="btn-order">Order Now →</a>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="project-card">
+        <div class="project-icon">🤖</div>
+        <div class="project-name">Line Following Robot</div>
+        <div class="project-desc">Autonomous robot that follows a black line using IR sensors. Includes speed control, obstacle detection, and a chassis with motors.</div>
+        <div class="tech-tags">
+          <span class="tech-tag">Arduino UNO</span>
+          <span class="tech-tag">IR Sensor</span>
+          <span class="tech-tag">L298N</span>
+        </div>
+        <div class="project-footer">
+          <div class="price-block">
+            <span class="price-original">₹2000</span>
+            <span class="price-offer">₹1500</span>
+            <span class="price-save">Save ₹500</span>
+          </div>
+          <a href="https://wa.me/919876543210?text=I want to order Line Following Robot - ₹1500" target="_blank" class="btn-order">Order Now →</a>
+        </div>
+      </div>
+
+      <!-- 6 -->
+      <div class="project-card">
+        <div class="project-icon">🚗</div>
+        <div class="project-name">Obstacle Avoiding Robot</div>
+        <div class="project-desc">Robot that detects and avoids obstacles automatically using ultrasonic sensors with servo-based scanning. Great for robotics competitions.</div>
+        <div class="tech-tags">
+          <span class="tech-tag">Arduino</span>
+          <span class="tech-tag">HC-SR04</span>
+          <span class="tech-tag">Servo Motor</span>
+        </div>
+        <div class="project-footer">
+          <div class="price-block">
+            <span class="price-original">₹2200</span>
+            <span class="price-offer">₹1700</span>
+            <span class="price-save">Save ₹500</span>
+          </div>
+          <a href="https://wa.me/919876543210?text=I want to order Obstacle Avoiding Robot - ₹1700" target="_blank" class="btn-order">Order Now →</a>
+        </div>
+      </div>
+
+      <!-- 7 -->
+      <div class="project-card">
+        <div class="project-icon">🌦️</div>
+        <div class="project-name">Weather Monitoring Station</div>
+        <div class="project-desc">Measure temperature, humidity, and air pressure. Data displayed on OLED and sent to cloud (ThingSpeak). Ideal for IoT mini-projects.</div>
+        <div class="tech-tags">
+          <span class="tech-tag">ESP8266</span>
+          <span class="tech-tag">DHT22</span>
+          <span class="tech-tag">BMP280</span>
+        </div>
+        <div class="project-footer">
+          <div class="price-block">
+            <span class="price-original">₹2500</span>
+            <span class="price-offer">₹2000</span>
+            <span class="price-save">Save ₹500</span>
+          </div>
+          <a href="https://wa.me/919876543210?text=I want to order Weather Monitoring Station - ₹2000" target="_blank" class="btn-order">Order Now →</a>
+        </div>
+      </div>
+
+      <!-- 8 -->
+      <div class="project-card">
+        <div class="project-icon">🎮</div>
+        <div class="project-name">Bluetooth Controlled Car</div>
+        <div class="project-desc">Control a 4-wheel drive car from your smartphone via Bluetooth. Free Android app included. Speed and direction control with LED headlights.</div>
+        <div class="tech-tags">
+          <span class="tech-tag">Arduino UNO</span>
+          <span class="tech-tag">HC-05</span>
+          <span class="tech-tag">L298N</span>
+        </div>
+        <div class="project-footer">
+          <div class="price-block">
+            <span class="price-original">₹1900</span>
+            <span class="price-offer">₹1400</span>
+            <span class="price-save">Save ₹500</span>
+          </div>
+          <a href="https://wa.me/919876543210?text=I want to order Bluetooth Controlled Car - ₹1400" target="_blank" class="btn-order">Order Now →</a>
+        </div>
+      </div>
+
+      <!-- 9 -->
+      <div class="project-card">
+        <div class="project-icon">💧</div>
+        <div class="project-name">IoT Water Quality Monitor</div>
+        <div class="project-desc">Monitor TDS, pH level, and turbidity of water. Sends real-time alerts via Telegram bot when levels cross threshold. Cloud dashboard included.</div>
+        <div class="tech-tags">
+          <span class="tech-tag">ESP32</span>
+          <span class="tech-tag">TDS Sensor</span>
+          <span class="tech-tag">pH Sensor</span>
+        </div>
+        <div class="project-footer">
+          <div class="price-block">
+            <span class="price-original">₹3500</span>
+            <span class="price-offer">₹2800</span>
+            <span class="price-save">Save ₹700</span>
+          </div>
+          <a href="https://wa.me/919876543210?text=I want to order IoT Water Quality Monitor - ₹2800" target="_blank" class="btn-order">Order Now →</a>
+        </div>
+      </div>
+
+      <!-- 10 -->
+      <div class="project-card">
+        <div class="project-icon">🔥</div>
+        <div class="project-name">Fire & Gas Alert System</div>
+        <div class="project-desc">Detects fire, smoke, and LPG gas leaks. Triggers buzzer alarm and sends SMS alert instantly. Suitable for home safety & industrial demos.</div>
+        <div class="tech-tags">
+          <span class="tech-tag">Arduino</span>
+          <span class="tech-tag">MQ-2 Sensor</span>
+          <span class="tech-tag">GSM SIM800</span>
+        </div>
+        <div class="project-footer">
+          <div class="price-block">
+            <span class="price-original">₹2400</span>
+            <span class="price-offer">₹1900</span>
+            <span class="price-save">Save ₹500</span>
+          </div>
+          <a href="https://wa.me/919876543210?text=I want to order Fire & Gas Alert System - ₹1900" target="_blank" class="btn-order">Order Now →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== SERVICES ===== -->
+<section id="services">
+  <div class="section-inner">
+    <span class="section-tag">// What We Do</span>
+    <h2>Our Services</h2>
+    <p class="section-desc">Beyond ready-made kits, we offer end-to-end support for students, institutions, and hobbyists.</p>
+
+    <div class="services-grid">
+
+      <div class="service-card">
+        <span class="service-num">01</span>
+        <span class="service-icon">⚙️</span>
+        <div class="service-title">Custom Project Development</div>
+        <div class="service-desc">Tell us your idea or project title — we'll design, build, and deliver a working prototype with full documentation and source code.</div>
+      </div>
+
+      <div class="service-card">
+        <span class="service-num">02</span>
+        <span class="service-icon">🎓</span>
+        <div class="service-title">School & College Support</div>
+        <div class="service-desc">Get your mini project or final year project done with proper report, PPT, and live demo support. Tailored for B.Tech, Diploma, and ITI students.</div>
+      </div>
+
+      <div class="service-card">
+        <span class="service-num">03</span>
+        <span class="service-icon">🖨️</span>
+        <div class="service-title">PCB Design & Fabrication</div>
+        <div class="service-desc">Custom PCB design using EasyEDA / KiCad. We handle schematic, layout, Gerber generation, and ordering. Perfect for production-ready builds.</div>
+      </div>
+
+      <div class="service-card">
+        <span class="service-num">04</span>
+        <span class="service-icon">🌐</span>
+        <div class="service-title">IoT Consulting</div>
+        <div class="service-desc">From sensor selection to cloud dashboard setup — we guide you through the full IoT stack. Ideal for startups and engineering students.</div>
+      </div>
+
+      <div class="service-card">
+        <span class="service-num">05</span>
+        <span class="service-icon">📦</span>
+        <div class="service-title">Component Supply</div>
+        <div class="service-desc">Need specific components? We source and supply electronic components at competitive prices. Bulk orders for colleges & labs welcome.</div>
+      </div>
+
+      <div class="service-card">
+        <span class="service-num">06</span>
+        <span class="service-icon">🖥️</span>
+        <div class="service-title">Workshop & Training</div>
+        <div class="service-desc">We conduct hands-on workshops in Arduino, IoT, and robotics for schools and colleges. Online sessions also available nationwide.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== PRICING ===== -->
+<section id="pricing">
+  <div class="section-inner">
+    <span class="section-tag">// Transparent Pricing</span>
+    <h2>Price Comparison</h2>
+    <p class="section-desc">We offer the best prices in the market. All projects include free documentation, source code, and 7-day support.</p>
+
+    <div class="pricing-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Project Name</th>
+            <th>Market Price</th>
+            <th>Our Price</th>
+            <th>Discount</th>
+            <th>Order</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>GPS Vehicle Tracker</td>
+            <td class="market-price">₹3,200</td>
+            <td class="offer-price">₹2,500</td>
+            <td><span class="discount-badge">22% OFF</span></td>
+            <td><a href="https://wa.me/919876543210?text=Order: GPS Tracker" target="_blank" class="btn-order">Order</a></td>
+          </tr>
+          <tr>
+            <td>Smart Home Automation</td>
+            <td class="market-price">₹2,500</td>
+            <td class="offer-price">₹1,800</td>
+            <td><span class="discount-badge">28% OFF</span></td>
+            <td><a href="https://wa.me/919876543210?text=Order: Smart Home" target="_blank" class="btn-order">Order</a></td>
+          </tr>
+          <tr>
+            <td>LoRa Communication System</td>
+            <td class="market-price">₹4,500</td>
+            <td class="offer-price">₹3,500</td>
+            <td><span class="discount-badge">22% OFF</span></td>
+            <td><a href="https://wa.me/919876543210?text=Order: LoRa System" target="_blank" class="btn-order">Order</a></td>
+          </tr>
+          <tr>
+            <td>RFID Attendance System</td>
+            <td class="market-price">₹2,800</td>
+            <td class="offer-price">₹2,200</td>
+            <td><span class="discount-badge">21% OFF</span></td>
+            <td><a href="https://wa.me/919876543210?text=Order: RFID Attendance" target="_blank" class="btn-order">Order</a></td>
+          </tr>
+          <tr>
+            <td>Line Following Robot</td>
+            <td class="market-price">₹2,000</td>
+            <td class="offer-price">₹1,500</td>
+            <td><span class="discount-badge">25% OFF</span></td>
+            <td><a href="https://wa.me/919876543210?text=Order: Line Follower" target="_blank" class="btn-order">Order</a></td>
+          </tr>
+          <tr>
+            <td>Obstacle Avoiding Robot</td>
+            <td class="market-price">₹2,200</td>
+            <td class="offer-price">₹1,700</td>
+            <td><span class="discount-badge">23% OFF</span></td>
+            <td><a href="https://wa.me/919876543210?text=Order: Obstacle Robot" target="_blank" class="btn-order">Order</a></td>
+          </tr>
+          <tr>
+            <td>Weather Monitoring Station</td>
+            <td class="market-price">₹2,500</td>
+            <td class="offer-price">₹2,000</td>
+            <td><span class="discount-badge">20% OFF</span></td>
+            <td><a href="https://wa.me/919876543210?text=Order: Weather Station" target="_blank" class="btn-order">Order</a></td>
+          </tr>
+          <tr>
+            <td>Bluetooth Controlled Car</td>
+            <td class="market-price">₹1,900</td>
+            <td class="offer-price">₹1,400</td>
+            <td><span class="discount-badge">26% OFF</span></td>
+            <td><a href="https://wa.me/919876543210?text=Order: BT Car" target="_blank" class="btn-order">Order</a></td>
+          </tr>
+          <tr>
+            <td>IoT Water Quality Monitor</td>
+            <td class="market-price">₹3,500</td>
+            <td class="offer-price">₹2,800</td>
+            <td><span class="discount-badge">20% OFF</span></td>
+            <td><a href="https://wa.me/919876543210?text=Order: Water Monitor" target="_blank" class="btn-order">Order</a></td>
+          </tr>
+          <tr>
+            <td>Fire & Gas Alert System</td>
+            <td class="market-price">₹2,400</td>
+            <td class="offer-price">₹1,900</td>
+            <td><span class="discount-badge">21% OFF</span></td>
+            <td><a href="https://wa.me/919876543210?text=Order: Fire Alert" target="_blank" class="btn-order">Order</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="font-size:0.78rem; color: var(--muted); font-family: var(--font-mono);">* All prices include hardware, assembly, testing, source code & documentation. Shipping extra (₹80–₹150).</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== PAYMENT ===== -->
+<section id="payment" style="background: var(--surface);">
+  <div class="section-inner">
+    <span class="section-tag">// Easy Payment</span>
+    <h2>Payment Methods</h2>
+    <p class="section-desc">We accept multiple payment options for your convenience. Advance payment confirms your order.</p>
+
+    <div class="payment-grid">
+      <div class="payment-methods">
+
+        <div class="pay-method">
+          <div class="pay-icon">📱</div>
+          <div>
+            <div class="pay-name">PhonePe / Google Pay / Paytm</div>
+            <div class="pay-detail">UPI ID: circuitnest@ybl</div>
+          </div>
+        </div>
+
+        <div class="pay-method">
+          <div class="pay-icon">🏦</div>
+          <div>
+            <div class="pay-name">Bank Transfer (NEFT / IMPS)</div>
+            <div class="pay-detail">Acc: 1234 5678 9012 · IFSC: SBIN0001234 · SBI</div>
+          </div>
+        </div>
+
+        <div class="pay-method">
+          <div class="pay-icon">💵</div>
+          <div>
+            <div class="pay-name">Cash on Pickup</div>
+            <div class="pay-detail">Available at our location in Vijayawada, AP</div>
+          </div>
+        </div>
+
+        <div class="pay-method">
+          <div class="pay-icon">🚚</div>
+          <div>
+            <div class="pay-name">Cash on Delivery (COD)</div>
+            <div class="pay-detail">Available for orders above ₹2000 within Andhra Pradesh</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="upi-box">
+        <div class="upi-label">Scan & Pay via UPI</div>
+        <div class="qr-placeholder">
+          [QR Code]<br/>circuitnest@ybl
+        </div>
+        <div class="upi-id">circuitnest@ybl</div>
+        <p style="font-size:0.78rem; color:var(--muted); line-height:1.6;">Accepted on PhonePe · Google Pay · Paytm · BHIM · Any UPI App</p>
+        <a href="https://wa.me/919876543210?text=I want to place an order on CircuitNest" target="_blank" class="whatsapp-btn">
+          📲 Order via WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact">
+  <div class="section-inner">
+    <span class="section-tag">// Get in Touch</span>
+    <h2>Contact Us</h2>
+    <p class="section-desc">Have a custom project idea? Need help with your college project? Reach out — we reply within 2 hours!</p>
+
+    <div class="contact-grid">
+      <div class="contact-info">
+
+        <div class="contact-card">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-label">Phone</div>
+            <div class="contact-value"><a href="tel:+919876543210">+91 98765 43210</a></div>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-icon">📲</div>
+          <div>
+            <div class="contact-label">WhatsApp</div>
+            <div class="contact-value"><a href="https://wa.me/919876543210" target="_blank">+91 98765 43210</a></div>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-icon">📧</div>
+          <div>
+            <div class="contact-label">Email</div>
+            <div class="contact-value"><a href="mailto:hello@circuitnest.in">hello@circuitnest.in</a></div>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-label">Location</div>
+            <div class="contact-value">Vijayawada, Andhra Pradesh — 520001</div>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-icon">🕐</div>
+          <div>
+            <div class="contact-label">Working Hours</div>
+            <div class="contact-value">Mon–Sat: 9 AM – 8 PM IST</div>
+          </div>
+        </div>
+
+        <a href="https://wa.me/919876543210?text=Hi, I need help with an electronics project" target="_blank" class="whatsapp-btn">
+          💬 Chat on WhatsApp Now
+        </a>
+      </div>
+
+      <div class="contact-form-area">
+        <div class="form-title">Send an Enquiry</div>
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" placeholder="e.g. Ravi Kumar" />
+        </div>
+        <div class="form-group">
+          <label>Phone / WhatsApp</label>
+          <input type="tel" placeholder="+91 XXXXX XXXXX" />
+        </div>
+        <div class="form-group">
+          <label>Project Interested In</label>
+          <select>
+            <option value="">-- Select Project --</option>
+            <option>GPS Vehicle Tracker – ₹2500</option>
+            <option>Smart Home Automation – ₹1800</option>
+            <option>LoRa Communication System – ₹3500</option>
+            <option>RFID Attendance System – ₹2200</option>
+            <option>Line Following Robot – ₹1500</option>
+            <option>Obstacle Avoiding Robot – ₹1700</option>
+            <option>Weather Monitoring Station – ₹2000</option>
+            <option>Bluetooth Controlled Car – ₹1400</option>
+            <option>IoT Water Quality Monitor – ₹2800</option>
+            <option>Fire & Gas Alert System – ₹1900</option>
+            <option>Custom Project (Let us know)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message / Requirements</label>
+          <textarea placeholder="Describe your project requirements, deadline, or any custom needs..."></textarea>
+        </div>
+        <button class="btn-submit" onclick="sendEnquiry()">
+          📨 Send via WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#home" class="logo">
+          <div class="logo-icon">⚡</div>
+          <div class="logo-text">Circuit<span>Nest</span></div>
+        </a>
+        <p>India's trusted source for ready-made IoT and Arduino projects. Helping students and hobbyists build the future, one circuit at a time.</p>
+        <div class="social-links">
+          <a href="#" class="social-link" title="Instagram">📸</a>
+          <a href="#" class="social-link" title="YouTube">▶️</a>
+          <a href="#" class="social-link" title="LinkedIn">💼</a>
+          <a href="https://wa.me/919876543210" target="_blank" class="social-link" title="WhatsApp">💬</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Projects</h4>
+        <ul>
+          <li><a href="#projects">GPS Tracker</a></li>
+          <li><a href="#projects">Smart Home</a></li>
+          <li><a href="#projects">LoRa System</a></li>
+          <li><a href="#projects">RFID Attendance</a></li>
+          <li><a href="#projects">Robots</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#services">Custom Projects</a></li>
+          <li><a href="#services">College Support</a></li>
+          <li><a href="#services">PCB Design</a></li>
+          <li><a href="#services">IoT Consulting</a></li>
+          <li><a href="#services">Workshops</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#payment">Payment</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="https://wa.me/919876543210" target="_blank">WhatsApp Order</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2025 CircuitNest. All rights reserved. Made with ❤️ in India 🇮🇳</span>
+      <span>Vijayawada, Andhra Pradesh</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function sendEnquiry() {
+    const name = document.querySelector('input[type="text"]').value || "Customer";
+    const phone = document.querySelector('input[type="tel"]').value || "N/A";
+    const project = document.querySelector('select').value || "Not selected";
+    const msg = document.querySelector('textarea').value || "No message";
+    const text = `Hello CircuitNest!%0A%0AName: ${encodeURIComponent(name)}%0APhone: ${encodeURIComponent(phone)}%0AProject: ${encodeURIComponent(project)}%0AMessage: ${encodeURIComponent(msg)}`;
+    window.open(`https://wa.me/919876543210?text=${text}`, '_blank');
+  }
+
+  // Smooth active nav highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+    });
+  });
+</script>
+
+</body>
+</html>
